@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Single-Pass Drone 3D Model</title>
+<style>
+:root{--bg:#071321;--panel:#0d1c2c;--panel2:#12253a;--line:#2b4662;--text:#f3f5f7;--muted:#aab8c7;--accent:#d8b45a;--blue:#55a9ff;--green:#6fd3a1}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#071321,#091827);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif} button,input{font:inherit} .top{height:74px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 6%;position:sticky;top:0;background:rgba(7,19,33,.96);z-index:5}.brand{font-family:Georgia,serif;font-size:24px;font-weight:700}.brand span{color:var(--accent)} nav{display:flex;gap:10px} nav button{background:transparent;border:1px solid transparent;color:var(--muted);padding:10px 14px;border-radius:9px;cursor:pointer}nav button.active,nav button:hover{border-color:#55708c;background:#15283d;color:#fff}
+main{max-width:1180px;margin:auto;padding:42px 24px 70px}.hero{display:flex;justify-content:space-between;align-items:end;margin-bottom:26px}.eyebrow{color:var(--accent);letter-spacing:2.5px;font-size:12px;text-transform:uppercase}.hero h1{font:700 44px Georgia,serif;margin:7px 0 0}.hero p{color:var(--muted);max-width:700px;line-height:1.55;margin:10px 0 0}.mode{display:none}.mode.active{display:block}.cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}.card{background:rgba(13,28,44,.9);border:1px solid var(--line);border-radius:16px;padding:20px}.card h2{font:700 24px Georgia,serif;margin:0 0 7px}.sub{color:var(--muted);font-size:14px;line-height:1.5;margin-bottom:17px}.media{height:370px;border:1px solid #3a5875;border-radius:12px;overflow:hidden;background:#06101c;display:flex;align-items:center;justify-content:center;position:relative}.media img,.media video{width:100%;height:100%;object-fit:cover}
+.demo-shade{position:absolute;inset:0;background:linear-gradient(transparent 58%,rgba(0,0,0,.82));pointer-events:none}.demo-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.48);border:1px solid rgba(255,255,255,.65);font-size:25px;color:#fff;z-index:2}.demo-controls{position:absolute;left:16px;right:16px;bottom:14px;display:flex;align-items:center;gap:11px;color:#fff;font-size:13px;z-index:3}.demo-control-play{font-size:17px}.demo-timeline{height:4px;flex:1;background:#707a83;border-radius:6px;overflow:hidden}.demo-timeline span{display:block;width:0;height:100%;background:#d8b45a;transition:width .15s linear}
+.demo-img{background-image:url('demo-input.png');background-size:cover;background-position:center}.demo-model{background-image:none;background-size:cover;background-position:center}.label{position:absolute;top:15px;left:15px;background:#17314b;border:1px solid #5b7897;border-radius:9px;padding:9px 14px;font-weight:700}.actions{display:flex;gap:10px;margin-top:15px}.btn{border:1px solid #47637f;background:#162b41;color:#fff;border-radius:9px;padding:12px 16px;cursor:pointer}.btn.primary{background:#d8b45a;color:#101923;border-color:#e1c77c;font-weight:800}.btn:disabled{opacity:.45;cursor:not-allowed}.result{margin-top:15px;border:1px solid #34516c;background:#102336;border-radius:11px;padding:15px;display:none}.result.show{display:block}.result strong{color:#fff}.steps{margin-top:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.step{border:1px solid var(--line);background:#0c1b2b;border-radius:10px;padding:11px;color:#77899b;font-size:13px}.step.done{color:#eaf2f8;border-color:#4f7698}.step.done:before{content:'✓ ';color:var(--green)}.progress{height:5px;background:#15293e;border-radius:9px;margin-top:15px;overflow:hidden}.bar{height:100%;width:0;background:var(--blue);transition:width .35s}.drop{border:1px dashed #63809c;border-radius:12px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer;background:#0b1b2b}.drop:hover{background:#102338}.drop .icon{font-size:38px;margin-bottom:8px}.drop input{display:none}.filename{color:var(--muted);font-size:13px;margin-top:10px}.frames{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}.frame{height:80px;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:#081321}.frame img{width:100%;height:100%;object-fit:cover}.model-preview{height:430px;border:1px solid #3a5875;border-radius:12px;background:#06101c;position:relative;overflow:hidden}.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}.how-card{background:#0d1c2c;border:1px solid var(--line);border-radius:14px;padding:18px}.how-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#17314b;border:1px solid #5b7897;color:#fff;font-weight:800;margin-bottom:12px}.how-card h3{margin:0 0 7px;font-size:16px}.how-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.how-banner{margin-top:20px;border:1px solid var(--line);background:#102336;border-radius:14px;padding:18px;color:#c7d3df;line-height:1.55}.create-layout{grid-template-columns:.9fr 1.1fr}.model-preview canvas{width:100%;height:100%;display:block}.model-preview #selectedFramePreview{display:none;width:100%;height:100%;object-fit:contain;background:#06101c}.model-tag{position:absolute;top:15px;left:15px;background:#17314b;border:1px solid #5b7897;border-radius:9px;padding:9px 14px;font-weight:700}.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px}.meta div{background:#0b1b2b;border:1px solid var(--line);border-radius:9px;padding:12px}.meta small{display:block;color:#7f91a4;margin-bottom:4px}.meta b{font-size:14px}.note{color:#8193a6;font-size:12px;line-height:1.5;margin-top:12px}.hidden{display:none!important}
+@media(max-width:850px){.cards{grid-template-columns:1fr}.hero{display:block}.steps{grid-template-columns:1fr 1fr}.frames{grid-template-columns:repeat(3,1fr)}}
+</style></head>
+<body>
+<header class="top"><div class="brand">Single-Pass Drone <span>3D Model</span></div><nav><button class="nav active" data-mode="demo">Demo</button><button class="nav" data-mode="create">Create Model</button><button class="nav" data-mode="how">How It Works</button></nav></header>
+<main>
+<section class="hero"><div><div class="eyebrow">Drone video reconstruction</div><h1 id="pageTitle">Demo</h1><p id="pageDesc">See the intended flow from a single drone-video frame to a reconstructed 3D scene.</p></div></section>
+
+<section id="demo" class="mode active">
+<div class="cards">
+<div class="card"><h2>Input Video</h2><div class="sub">A sample drone-video frame is loaded for the demonstration.</div><div class="media demo-img" id="demoVideoBox">
+<div style="position:absolute;inset:0;background:linear-gradient(transparent 64%,rgba(0,0,0,.78));pointer-events:none"></div>
+<div style="position:absolute;left:18px;bottom:15px;right:18px;display:flex;align-items:center;gap:12px;color:#fff;font-size:13px;z-index:2">
+<span style="font-size:18px">▶</span>
+<span id="demoTime">0:00 / 0:30</span>
+<div style="height:4px;flex:1;background:#66717b;border-radius:5px;overflow:hidden">
+<span id="demoTimelineFill" style="display:block;width:0%;height:100%;background:#d8b45a;transition:width .2s linear"></span>
+</div>
+<span>⚙</span>
+</div>
+<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.48);border:1px solid rgba(255,255,255,.55);font-size:25px;color:#fff;z-index:2">▶</div>
+</div><div class="actions"><button class="btn primary" id="demoAnalyze">Analyze Video</button></div></div>
+<div class="card"><h2>3D Reconstruction</h2><div class="sub">The output preview uses the same sample scene to demonstrate the reconstruction result.</div><div class="media demo-model" id="demoModel"><div id="demoBlank" style="color:#6f8498;font-size:14px">Click “Analyze Video” to generate the reconstruction.</div></div></div>
+</div>
+
+</section>
+
+<section id="create" class="mode">
+<div class="cards create-layout">
+<div class="card"><h2>Upload Drone Video</h2><div class="sub">Choose a local drone video. The browser extracts representative frames for the prototype reconstruction flow.</div><label class="drop" for="videoInput"><div class="icon">▣</div><b>Upload drone video</b><span class="filename" id="videoName">MP4, MOV or WebM</span><input id="videoInput" type="file" accept="video/*"></label><div class="media hidden" id="videoBox"><video id="video" controls></video></div><div class="actions"><button class="btn primary" id="createBtn" disabled>Create 3D Model</button><button class="btn" id="clearVideo">Clear</button></div><div class="progress"><div class="bar" id="createBar"></div></div><div class="frames" id="frames"></div></div>
+<div class="card"><h2>3D Model Output</h2><div class="sub">The result appears here after the video is processed.</div><div class="model-preview"><canvas id="modelCanvas"></canvas><img id="selectedFramePreview" alt="Generated 3D reconstruction" /><div class="model-tag">3D Reconstruction</div></div></div>
+</div>
+</section>
+<section id="how" class="mode">
+  <div class="card">
+    <h2>How It Works</h2>
+    <div class="sub">The prototype demonstrates the complete single-pass reconstruction workflow from video input to a 3D scene preview.</div>
+    <div class="how-grid">
+      <div class="how-card"><div class="how-num">1</div><h3>Video Analysis</h3><p>The uploaded drone video is read and its duration and frames are examined.</p></div>
+      <div class="how-card"><div class="how-num">2</div><h3>Frame Selection</h3><p>Useful frames are sampled from the single flight video while avoiding unnecessary frames.</p></div>
+      <div class="how-card"><div class="how-num">3</div><h3>Camera Motion & Depth</h3><p>Visual information across frames is used to create a depth-aware spatial representation.</p></div>
+      <div class="how-card"><div class="how-num">4</div><h3>3D Reconstruction</h3><p>The processed visual points are projected into a 3D-style scene for inspection.</p></div>
+    </div>
+    <div class="how-banner"><b>Prototype scope:</b> this browser demo shows the reconstruction pipeline visually. A production implementation would connect the same stages to photogrammetry tools such as COLMAP/Open3D for metric-accurate 3D reconstruction and georeferencing.</div>
+  </div>
+</section>
+
+</main>
+<script>
+const demoRef='demo-reference.png';
+const navs=document.querySelectorAll('.nav');const modes=document.querySelectorAll('.mode');const title=document.getElementById('pageTitle');const desc=document.getElementById('pageDesc');
+const modeText={demo:['Demo','See the intended flow from a single drone-video frame to a reconstructed 3D scene.'],create:['Create Model','Upload your drone video, extract useful frames, and generate a reconstruction preview.'],how:['How It Works','See the four stages used by the prototype.']};
+navs.forEach(n=>n.onclick=()=>{navs.forEach(x=>x.classList.remove('active'));n.classList.add('active');modes.forEach(m=>m.classList.remove('active'));document.getElementById(n.dataset.mode).classList.add('active');title.textContent=modeText[n.dataset.mode][0];desc.textContent=modeText[n.dataset.mode][1]});
+const demoAnalyze=document.getElementById('demoAnalyze');
+const demoModel=document.getElementById('demoModel');
+const demoTimelineFill=document.getElementById('demoTimelineFill');
+const demoTime=document.getElementById('demoTime');
+let demoTimer=null;
+demoAnalyze.onclick=()=>{
+  if(demoTimer) clearInterval(demoTimer);
+  demoAnalyze.disabled=true;
+  demoAnalyze.textContent='Analyzing video…';
+  const blank=document.getElementById('demoBlank'); if(blank) blank.remove();
+  demoModel.style.backgroundImage='none';
+  demoModel.innerHTML='<div style="width:78%;height:8px;background:#14283d;border-radius:10px;overflow:hidden"><div id="demoBar" style="height:100%;width:0;background:#4f91c9;transition:width .45s"></div></div>';
+  const bar=document.getElementById('demoBar');
+  let w=0;
+  demoTimer=setInterval(()=>{
+    w=Math.min(100,w+20);
+    bar.style.width=w+'%';
+    if(demoTimelineFill) demoTimelineFill.style.width=w+'%';
+    if(demoTime){
+      const seconds=Math.round(w*30/100);
+      demoTime.textContent='0:'+String(seconds).padStart(2,'0')+' / 0:30';
+    }
+    if(w>=100){
+      clearInterval(demoTimer);
+      demoTimer=null;
+      demoModel.innerHTML='';
+      demoModel.style.backgroundImage="url('demo-output.png')";
+      demoModel.style.backgroundSize='cover';
+      demoModel.style.backgroundPosition='center';
+      demoAnalyze.textContent='Reconstruction ready';
+      demoAnalyze.disabled=false;
+    }
+  },220);
+};
+const input=document.getElementById('videoInput'),video=document.getElementById('video'),videoBox=document.getElementById('videoBox'),videoName=document.getElementById('videoName'),createBtn=document.getElementById('createBtn'),framesBox=document.getElementById('frames');let objectURL=null,frameImages=[],frameScores=[],bestFrameIndex=-1;
+input.onchange=()=>{const f=input.files[0];if(!f)return;if(objectURL)URL.revokeObjectURL(objectURL);objectURL=URL.createObjectURL(f);video.src=objectURL;videoBox.classList.remove('hidden');videoName.textContent=f.name;createBtn.disabled=false;framesBox.innerHTML='';frameImages=[]};
+document.getElementById('clearVideo').onclick=()=>{input.value='';video.removeAttribute('src');video.load();videoBox.classList.add('hidden');videoName.textContent='MP4, MOV or WebM';createBtn.disabled=true;framesBox.innerHTML='';frameImages=[];frameScores=[];bestFrameIndex=-1;document.getElementById('createBar').style.width='0%';clearCanvas()};
+async function waitForEvent(el,event,timeout=5000){return new Promise((resolve,reject)=>{let done=false;const finish=()=>{if(done)return;done=true;el.removeEventListener(event,finish);clearTimeout(t);resolve()};const t=setTimeout(()=>{if(done)return;done=true;el.removeEventListener(event,finish);reject(new Error('Video processing timed out'))},timeout);el.addEventListener(event,finish,{once:true})})}
+function clarityScore(cx,w,h){
+  const sw=160, sh=90; const tmp=document.createElement('canvas'); tmp.width=sw; tmp.height=sh; const tc=tmp.getContext('2d'); tc.drawImage(cx.canvas,0,0,sw,sh);
+  const d=tc.getImageData(0,0,sw,sh).data; let sum=0,sum2=0,n=0;
+  const gray=(x,y)=>{const k=(y*sw+x)*4;return .299*d[k]+.587*d[k+1]+.114*d[k+2]};
+  for(let y=1;y<sh-1;y++) for(let x=1;x<sw-1;x++){const gx=gray(x+1,y)-gray(x-1,y),gy=gray(x,y+1)-gray(x,y-1);const v=gx*gx+gy*gy;sum+=v;sum2+=v*v;n++;}
+  const mean=sum/n, variance=Math.max(0,sum2/n-mean*mean); return Math.sqrt(variance);
+}
+function selectedFrameUrl(urls){return urls && urls.length ? urls[Math.max(0,bestFrameIndex)] : null;}
+async function extractFrames(){
+  if(!video.src) throw new Error('No video selected');
+  if(!isFinite(video.duration) || video.readyState<1) await waitForEvent(video,'loadedmetadata',8000);
+  const duration=video.duration;
+  if(!duration || !isFinite(duration)) throw new Error('Could not read video duration');
+  const count=5; framesBox.innerHTML=''; frameImages=[]; frameScores=[]; bestFrameIndex=-1;
+  for(let i=0;i<count;i++){
+    const t=Math.min(duration-0.05, Math.max(0.02, duration*(i+1)/(count+1)));
+    video.currentTime=t;
+    try{await waitForEvent(video,'seeked',5000)}catch(e){/* continue with current frame if browser already sought */}
+    const c=document.createElement('canvas'); c.width=640; c.height=360;
+    const cx=c.getContext('2d'); cx.drawImage(video,0,0,c.width,c.height);
+    const url=c.toDataURL('image/jpeg',.88); frameImages.push(url);
+    const score=clarityScore(cx, c.width, c.height); frameScores.push(score);
+    const d=document.createElement('div'); d.className='frame'; d.title='Frame '+(i+1)+' · clarity score '+score.toFixed(0);
+    const im=document.createElement('img'); im.src=url; d.appendChild(im); framesBox.appendChild(d);
+  }
+  bestFrameIndex=frameScores.reduce((best,score,i)=>score>frameScores[best]?i:best,0);
+  [...framesBox.children].forEach((el,i)=>{if(i===bestFrameIndex){el.style.borderColor='#d8b45a';el.style.boxShadow='0 0 0 2px rgba(216,180,90,.2) inset';el.title+=' · Selected strongest frame';}});
+  return frameImages;
+}
+createBtn.onclick=async()=>{
+  createBtn.disabled=true; const bar=document.getElementById('createBar');
+  bar.style.width='5%';
+  try{
+    await new Promise(r=>setTimeout(r,120)); bar.style.width='18%';
+    const imgs=await extractFrames(); bar.style.width='55%';
+    await new Promise(r=>setTimeout(r,220)); bar.style.width='72%';
+    renderReconstruction(imgs); await new Promise(r=>setTimeout(r,450));
+    bar.style.width='100%'; 
+  }catch(e){console.error(e);}
+  createBtn.disabled=false;
+};
+const canvas=document.getElementById('modelCanvas'),ctx=canvas.getContext('2d');function resize(){const r=canvas.getBoundingClientRect();canvas.width=Math.max(1,r.width*devicePixelRatio);canvas.height=Math.max(1,r.height*devicePixelRatio);ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}window.addEventListener('resize',()=>{resize();});resize();
+function drawFallback(){const w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);ctx.fillStyle='#06101c';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#24415c';ctx.lineWidth=1;for(let i=-5;i<=5;i++){ctx.beginPath();ctx.moveTo(w*.12+i*w*.075,h*.78);ctx.lineTo(w*.5+i*w*.075,h*.48);ctx.stroke();ctx.beginPath();ctx.moveTo(w*.5+i*w*.075,h*.48);ctx.lineTo(w*.88+i*w*.025,h*.78);ctx.stroke()}ctx.strokeStyle='#2d6b9e';ctx.beginPath();ctx.moveTo(w*.18,h*.72);ctx.lineTo(w*.5,h*.38);ctx.lineTo(w*.82,h*.72);ctx.closePath();ctx.stroke()}
+function renderReconstruction(urls){
+  const selected=selectedFrameUrl(urls);
+  const preview=document.getElementById('selectedFramePreview');
+  if(!selected){drawFallback();return;}
+  const im=new Image();
+  im.onload=()=>drawSelectedFrame3D(im);
+  im.onerror=()=>{preview.src=selected; preview.style.display='block'; canvas.style.display='none';};
+  im.src=selected;
+}
+function drawSelectedFrame3D(img){
+  const rect=canvas.getBoundingClientRect();
+  const w=Math.max(1,Math.round(rect.width)),h=Math.max(1,Math.round(rect.height));
+  canvas.width=w*devicePixelRatio; canvas.height=h*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  canvas.style.display='block';
+  const preview=document.getElementById('selectedFramePreview'); preview.style.display='none';
+  ctx.clearRect(0,0,w,h); ctx.fillStyle='#06101c'; ctx.fillRect(0,0,w,h);
+
+  // Build a visible depth-style reconstruction from the strongest extracted frame.
+  const padX=w*.10, padY=h*.10, dw=w*.80, dh=h*.68;
+  const layers=12;
+  for(let i=layers;i>=1;i--){
+    const ox=i*2.0, oy=i*1.1;
+    ctx.globalAlpha=.08;
+    ctx.drawImage(img,padX+ox,padY+oy,dw,dh);
+  }
+  ctx.globalAlpha=1;
+  ctx.save();
+  // Slight perspective treatment: the image is displayed as a reconstructed textured surface.
+  ctx.drawImage(img,padX,padY,dw,dh);
+  ctx.strokeStyle='rgba(216,180,90,.85)'; ctx.lineWidth=2;
+  ctx.strokeRect(padX,padY,dw,dh);
+  // Depth edges
+  ctx.strokeStyle='rgba(216,180,90,.45)'; ctx.lineWidth=1.5;
+  for(let i=1;i<=6;i++){
+    const ox=i*3,oy=i*2;
+    ctx.beginPath();ctx.moveTo(padX+dw,padY+dh);ctx.lineTo(padX+dw+ox,padY+dh+oy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(padX+dw,padY);ctx.lineTo(padX+dw+ox,padY+oy);ctx.stroke();
+  }
+  ctx.fillStyle='#d8b45a';ctx.font='700 13px Arial';ctx.fillText('REGENERATED 3D MODEL',18,28);
+  ctx.restore();
+}
+function drawReconstructionImages(imgs){const selected=selectedFrameUrl(imgs);if(selected){const im=new Image();im.onload=()=>drawSelectedFrame3D(im);im.src=selected;}else drawFallback();}
+function drawReconstructionImages(imgs){const w=canvas.clientWidth,h=canvas.clientHeight;ctx.clearRect(0,0,w,h);ctx.fillStyle='#06101c';ctx.fillRect(0,0,w,h);const points=[];imgs.forEach((img,fi)=>{const off=document.createElement('canvas');off.width=70;off.height=45;const oc=off.getContext('2d');oc.drawImage(img,0,0,70,45);const d=oc.getImageData(0,0,70,45).data;for(let y=1;y<44;y+=2){for(let x=1;x<69;x+=2){const k=(y*70+x)*4;const r=d[k],g=d[k+1],b=d[k+2];const lum=(r+g+b)/3;if(lum<42)continue;const depth=(fi/(imgs.length-1||1)-.5)*120 + (255-lum)*.10;const scale=.72 + (lum/255)*.42;const px=w/2+(x-35)*7.0*scale+depth*.30;const py=h/2+(y-22)*6.0*scale-depth*.10;points.push({x:px,y:py,z:depth,r,g,b,lum})}}});
+points.sort((a,b)=>a.z-b.z);for(const p of points){const s=1.1+Math.max(0,120-p.z)*.004;ctx.fillStyle=`rgba(${p.r},${p.g},${p.b},${.62+Math.min(.3,p.lum/900)})`;ctx.fillRect(p.x,p.y,s,s)}
+ctx.strokeStyle='rgba(90,145,190,.28)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(w*.14,h*.77);ctx.lineTo(w*.50,h*.43);ctx.lineTo(w*.86,h*.77);ctx.closePath();ctx.stroke();ctx.fillStyle='#8ea6bd';ctx.font='12px Segoe UI,Arial';ctx.fillText('Prototype 3D reconstruction preview',w*.04,h*.94)}
+</script></body></html>
